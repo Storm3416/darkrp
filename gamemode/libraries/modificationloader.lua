@@ -6,34 +6,36 @@
 --[[---------------------------------------------------------------------------
 Disabled defaults
 ---------------------------------------------------------------------------]]
-DarkRP.disabledDefaults = {}
-DarkRP.disabledDefaults["modules"] = {
-    ["afk"]              = true,
-    ["chatsounds"]       = false,
-    ["events"]           = false,
-    ["fpp"]              = false,
-    ["hitmenu"]          = false,
-    ["hud"]              = false,
-    ["hungermod"]        = true,
-    ["playerscale"]      = false,
-    ["sleep"]            = false,
+DarkRP.disabledDefaults                 = {}
+DarkRP.disabledDefaults["modules"]      = {
+    ["afk"]                = true,
+    ["chatsounds"]         = true,
+    ["events"]             = true,
+    ["fpp"]                = false,
+    ["hitmenu"]            = true,
+    ["hud"]                = false,
+    ["hungermod"]          = true,
+    ["passengermodcompat"] = true,
+    ["playerscale"]        = false,
+    ["sleep"]              = true,
 }
 
-DarkRP.disabledDefaults["agendas"]          = {}
-DarkRP.disabledDefaults["ammo"]             = {}
-DarkRP.disabledDefaults["demotegroups"]     = {}
-DarkRP.disabledDefaults["doorgroups"]       = {}
-DarkRP.disabledDefaults["entities"]         = {}
-DarkRP.disabledDefaults["food"]             = {}
-DarkRP.disabledDefaults["groupchat"]        = {}
-DarkRP.disabledDefaults["hitmen"]           = {}
-DarkRP.disabledDefaults["jobs"]             = {}
-DarkRP.disabledDefaults["shipments"]        = {}
-DarkRP.disabledDefaults["vehicles"]         = {}
-DarkRP.disabledDefaults["workarounds"]      = {}
+DarkRP.disabledDefaults["agendas"]      = {}
+DarkRP.disabledDefaults["ammo"]         = {}
+DarkRP.disabledDefaults["demotegroups"] = {}
+DarkRP.disabledDefaults["doorgroups"]   = {}
+DarkRP.disabledDefaults["entities"]     = {}
+DarkRP.disabledDefaults["food"]         = {}
+DarkRP.disabledDefaults["groupchat"]    = {}
+DarkRP.disabledDefaults["hitmen"]       = {}
+DarkRP.disabledDefaults["jobs"]         = {}
+DarkRP.disabledDefaults["shipments"]    = {}
+DarkRP.disabledDefaults["vehicles"]     = {}
+DarkRP.disabledDefaults["workarounds"]  = {}
 
 -- The client cannot use simplerr.runLuaFile because of restrictions in GMod.
-local doInclude = CLIENT and include or fc{simplerr.wrapError, simplerr.wrapLog, simplerr.runFile}
+local doInclude                         = CLIENT and include or
+fc { simplerr.wrapError, simplerr.wrapLog, simplerr.runFile }
 
 if file.Exists("darkrp_config/disabled_defaults.lua", "LUA") then
     if SERVER then AddCSLuaFile("darkrp_config/disabled_defaults.lua") end
@@ -69,12 +71,12 @@ local function loadModules()
         -- Sound but incomplete way of detecting the error of putting addons in the darkrpmod folder
         if file.Exists(fol .. folder .. "/addon.txt", "LUA") or file.Exists(fol .. folder .. "/addon.json", "LUA") then
             DarkRP.errorNoHalt("Addon detected in the darkrp_modules folder.", 2, {
-                "This addon is not supposed to be in the darkrp_modules folder.",
-                "It is supposed to be in garrysmod/addons/ instead.",
-                "Whether a mod is to be installed in darkrp_modules or addons is the author's decision.",
-                "Please read the readme of the addons you're installing next time."
-            },
-            "<darkrpmod addon>/lua/darkrp_modules/" .. folder, -1)
+                    "This addon is not supposed to be in the darkrp_modules folder.",
+                    "It is supposed to be in garrysmod/addons/ instead.",
+                    "Whether a mod is to be installed in darkrp_modules or addons is the author's decision.",
+                    "Please read the readme of the addons you're installing next time."
+                },
+                "<darkrpmod addon>/lua/darkrp_modules/" .. folder, -1)
             continue
         end
 
@@ -125,8 +127,8 @@ local customFiles = {
     "darkrp_customthings/ammo.lua",
     "darkrp_customthings/groupchats.lua",
     "darkrp_customthings/categories.lua",
-    "darkrp_customthings/agendas.lua", -- has to be run after jobs.lua
-    "darkrp_customthings/doorgroups.lua", -- has to be run after jobs.lua
+    "darkrp_customthings/agendas.lua",      -- has to be run after jobs.lua
+    "darkrp_customthings/doorgroups.lua",   -- has to be run after jobs.lua
     "darkrp_customthings/demotegroups.lua", -- has to be run after jobs.lua
 }
 local function loadCustomDarkRPItems()

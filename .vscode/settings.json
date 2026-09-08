@@ -1,0 +1,12 @@
+{
+    "Lua.diagnostics.globals": [
+        "DarkRP",
+        "continue",
+        "AddCSLuaFile",
+        "SERVER",
+        "SortedPairs",
+        "isfunction",
+        "istable",
+        "checkTable"
+    ]
+}

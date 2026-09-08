@@ -26,14 +26,14 @@ function GM:getVehicleCost(ply, ent)
     return GAMEMODE.Config.vehiclecost ~= 0 and GAMEMODE.Config.vehiclecost or 40
 end
 
-local disallowedNames = {["ooc"] = true, ["shared"] = true, ["world"] = true, ["world prop"] = true}
+local disallowedNames = { ["ooc"] = true, ["shared"] = true, ["world"] = true, ["world prop"] = true }
 function GM:CanChangeRPName(ply, RPname)
     if disallowedNames[string.lower(RPname)] then return false, DarkRP.getPhrase("forbidden_name") end
     if not string.match(RPname, "^[a-zA-ZЀ-џ0-9 ]+$") then return false, DarkRP.getPhrase("illegal_characters") end
 
     local len = string.len(RPname)
     if len > 30 then return false, DarkRP.getPhrase("too_long") end
-    if len < 3 then return false,  DarkRP.getPhrase("too_short") end
+    if len < 3 then return false, DarkRP.getPhrase("too_short") end
 end
 
 function GM:canDemote(ply, target, reason)
@@ -115,7 +115,6 @@ function GM:PlayerSpawnProp(ply, model)
     local allowed = GAMEMODE.Config.propspawning
 
     if not allowed then return false end
-    if ply:isArrested() then return false end
 
     model = string.gsub(tostring(model), "\\", "/")
     model = string.gsub(tostring(model), "//", "/")
@@ -150,7 +149,6 @@ function GM:PlayerSpawnedProp(ply, model, ent)
     end
 end
 
-
 local function checkAdminSpawn(ply, configVar, errorStr)
     local config = GAMEMODE.Config[configVar]
 
@@ -161,7 +159,8 @@ local function checkAdminSpawn(ply, configVar, errorStr)
         DarkRP.notify(ply, 1, 5, DarkRP.getPhrase("need_sadmin", DarkRP.getPhrase(errorStr) or errorStr))
         return false
     elseif config == 3 and ply:EntIndex() ~= 0 then
-        DarkRP.notify(ply, 1, 5, DarkRP.getPhrase("disabled", DarkRP.getPhrase(errorStr) or errorStr, DarkRP.getPhrase("see_settings")))
+        DarkRP.notify(ply, 1, 5,
+            DarkRP.getPhrase("disabled", DarkRP.getPhrase(errorStr) or errorStr, DarkRP.getPhrase("see_settings")))
         return false
     end
 
@@ -169,7 +168,7 @@ local function checkAdminSpawn(ply, configVar, errorStr)
 end
 
 function GM:PlayerSpawnSENT(ply, class)
-    return checkAdminSpawn(ply, "adminsents", "gm_spawnsent") and self.Sandbox.PlayerSpawnSENT(self, ply, class) and not ply:isArrested()
+    return checkAdminSpawn(ply, "adminsents", "gm_spawnsent") and self.Sandbox.PlayerSpawnSENT(self, ply, class)
 end
 
 function GM:PlayerSpawnedSENT(ply, ent)
@@ -179,9 +178,9 @@ end
 
 local function canSpawnWeapon(ply)
     if (GAMEMODE.Config.adminweapons == 0 and ply:IsAdmin()) or
-    (GAMEMODE.Config.adminweapons == 1 and ply:IsSuperAdmin()) or
-    -- Can't use 2 to maintain compatibility
-    (GAMEMODE.Config.adminweapons == 3) then
+        (GAMEMODE.Config.adminweapons == 1 and ply:IsSuperAdmin()) or
+        -- Can't use 2 to maintain compatibility
+        (GAMEMODE.Config.adminweapons == 3) then
         return true
     end
     DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("cant_spawn_weapons"))
@@ -190,29 +189,31 @@ local function canSpawnWeapon(ply)
 end
 
 function GM:PlayerSpawnSWEP(ply, class, info)
-    return canSpawnWeapon(ply) and self.Sandbox.PlayerSpawnSWEP(self, ply, class, info) and not ply:isArrested()
+    return canSpawnWeapon(ply) and self.Sandbox.PlayerSpawnSWEP(self, ply, class, info)
 end
 
 function GM:PlayerGiveSWEP(ply, class, info)
-    return canSpawnWeapon(ply) and self.Sandbox.PlayerGiveSWEP(self, ply, class, info) and not ply:isArrested()
+    return canSpawnWeapon(ply) and self.Sandbox.PlayerGiveSWEP(self, ply, class, info)
 end
 
 function GM:PlayerSpawnEffect(ply, model)
-    return self.Sandbox.PlayerSpawnEffect(self, ply, model) and not ply:isArrested()
+    return self.Sandbox.PlayerSpawnEffect(self, ply, model)
 end
 
 function GM:PlayerSpawnVehicle(ply, model, class, info)
-    return checkAdminSpawn(ply, "adminvehicles", "gm_spawnvehicle") and self.Sandbox.PlayerSpawnVehicle(self, ply, model, class, info) and not ply:isArrested()
+    return checkAdminSpawn(ply, "adminvehicles", "gm_spawnvehicle") and
+    self.Sandbox.PlayerSpawnVehicle(self, ply, model, class, info)
 end
 
 function GM:PlayerSpawnedVehicle(ply, ent)
     self.Sandbox.PlayerSpawnedVehicle(self, ply, ent)
     local vehicleClass = ent.GetVehicleClass and " (" .. ent:GetVehicleClass() .. ")" or ""
-    DarkRP.log(ply:Nick() .. " (" .. ply:SteamID() .. ") spawned Vehicle " .. ent:GetClass() .. vehicleClass, Color(255, 255, 0))
+    DarkRP.log(ply:Nick() .. " (" .. ply:SteamID() .. ") spawned Vehicle " .. ent:GetClass() .. vehicleClass,
+        Color(255, 255, 0))
 end
 
 function GM:PlayerSpawnNPC(ply, type, weapon)
-    return checkAdminSpawn(ply, "adminnpcs", "gm_spawnnpc") and self.Sandbox.PlayerSpawnNPC(self, ply, type, weapon) and not ply:isArrested()
+    return checkAdminSpawn(ply, "adminnpcs", "gm_spawnnpc") and self.Sandbox.PlayerSpawnNPC(self, ply, type, weapon)
 end
 
 function GM:PlayerSpawnedNPC(ply, ent)
@@ -221,7 +222,7 @@ function GM:PlayerSpawnedNPC(ply, ent)
 end
 
 function GM:PlayerSpawnRagdoll(ply, model)
-    return self.Sandbox.PlayerSpawnRagdoll(self, ply, model) and not ply:isArrested()
+    return self.Sandbox.PlayerSpawnRagdoll(self, ply, model)
 end
 
 function GM:PlayerSpawnedRagdoll(ply, model, ent)
@@ -296,7 +297,7 @@ end
 
 -- IsInRoom function to see if the player is in the same room.
 local roomTrResult = {}
-local roomTr = {output = roomTrResult}
+local roomTr = { output = roomTrResult }
 local function IsInRoom(listenerShootPos, talkerShootPos, talker)
     roomTr.start = talkerShootPos
     roomTr.endpos = listenerShootPos
@@ -323,7 +324,7 @@ for _, ply in ipairs(player.GetAll()) do
 end
 
 local gridSize = GM.Config.voiceDistance -- Grid cell size is equal to the size of the radius of player talking
-local floor = math.floor -- Caching floor as we will need to use it a lot
+local floor = math.floor                 -- Caching floor as we will need to use it a lot
 
 -- Grid based position check
 local grid
@@ -384,7 +385,7 @@ timer.Create("DarkRPCanHearPlayersVoice", DarkRP.voiceCheckTimeDelay, 0, functio
 
         for i = 0, 3 do
             local vOffset = 1 - ((i >= 3) and 1 or 0)
-            local hOffset = -(i % 3-1)
+            local hOffset = -(i % 3 - 1)
             local x = gridX + hOffset
             local y = gridY + vOffset
 
@@ -396,8 +397,8 @@ timer.Create("DarkRPCanHearPlayersVoice", DarkRP.voiceCheckTimeDelay, 0, functio
 
             for _, ply2 in ipairs(cell) do
                 local canTalk =
-                    ply1Pos:DistToSqr(plyPos[ply2]) < voiceDistance and -- voiceradius is on and the two are within hearing distance
-                        (not dynv or IsInRoom(ply1EyePos, eyePos[ply2], ply2)) -- Dynamic voice is on and players are in the same room
+                    ply1Pos:DistToSqr(plyPos[ply2]) < voiceDistance and        -- voiceradius is on and the two are within hearing distance
+                    (not dynv or IsInRoom(ply1EyePos, eyePos[ply2], ply2))     -- Dynamic voice is on and players are in the same room
 
                 DrpCanHear[ply1][ply2] = canTalk and (deadv or ply2:Alive())
                 DrpCanHear[ply2][ply1] = canTalk and (deadv or ply1:Alive()) -- Take advantage of the symmetry
@@ -415,8 +416,8 @@ timer.Create("DarkRPCanHearPlayersVoice", DarkRP.voiceCheckTimeDelay, 0, functio
                 for j = i + 1, count do
                     local ply2 = cell[j]
                     local canTalk =
-                        plyPos[ply1]:DistToSqr(plyPos[ply2]) < voiceDistance and -- voiceradius is on and the two are within hearing distance
-                            (not dynv or IsInRoom(eyePos[ply1], eyePos[ply2], ply2)) -- Dynamic voice is on and players are in the same room
+                        plyPos[ply1]:DistToSqr(plyPos[ply2]) < voiceDistance and     -- voiceradius is on and the two are within hearing distance
+                        (not dynv or IsInRoom(eyePos[ply1], eyePos[ply2], ply2))     -- Dynamic voice is on and players are in the same room
 
                     DrpCanHear[ply1][ply2] = canTalk and (deadv or ply2:Alive())
                     DrpCanHear[ply2][ply1] = canTalk and (deadv or ply1:Alive()) -- Take advantage of the symmetry
@@ -450,10 +451,10 @@ function GM:CanTool(ply, trace, mode)
         end
 
         if ent.nodupe and (mode == "weld" or
-                    mode == "weld_ez" or
-                    mode == "spawner" or
-                    mode == "duplicator" or
-                    mode == "adv_duplicator") then
+                mode == "weld_ez" or
+                mode == "spawner" or
+                mode == "duplicator" or
+                mode == "adv_duplicator") then
             return false
         end
 
@@ -469,10 +470,7 @@ function GM:CanPlayerSuicide(ply)
         DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("unable", "suicide", ""))
         return false
     end
-    if ply:isArrested() then
-        DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("unable", "suicide", ""))
-        return false
-    end
+
     if GAMEMODE.Config.wantedsuicide and ply:getDarkRPVar("wanted") then
         DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("unable", "suicide", ""))
         return false
@@ -537,16 +535,6 @@ function GM:PlayerDeath(ply, weapon, killer)
 
     ply:ExitVehicle()
 
-    if ply:isArrested() and not GAMEMODE.Config.respawninjail then
-        -- If the player died in jail, make sure they can't respawn until their jail sentence is over
-        -- NextSpawnTime is set to CurTime() on unarrest
-        ply.NextSpawnTime = math.huge
-        DarkRP.printMessageAll(HUD_PRINTCENTER, DarkRP.getPhrase("died_in_jail", ply:Nick()))
-        DarkRP.notify(ply, 4, 4, DarkRP.getPhrase("dead_in_jail"))
-    else
-        -- Normal death, respawning.
-        ply.NextSpawnTime = CurTime() + math.Clamp(GAMEMODE.Config.respawntime, 0, 10)
-    end
     ply.DeathPos = ply:GetPos()
 
     if GAMEMODE.Config.dropmoneyondeath then
@@ -561,7 +549,7 @@ function GM:PlayerDeath(ply, weapon, killer)
         end
     end
 
-    if IsValid(ply) and (ply ~= killer or ply.Slayed) and not ply:isArrested() then
+    if IsValid(ply) and (ply ~= killer or ply.Slayed) then
         if not GAMEMODE.Config.wantedrespawn then
             ply:setDarkRPVar("wanted", nil)
         end
@@ -572,7 +560,9 @@ function GM:PlayerDeath(ply, weapon, killer)
     ply.ConfiscatedWeapons = nil
 
     local KillerName = (killer:IsPlayer() and killer:Nick()) or tostring(killer)
-    local WeaponName = IsValid(weapon) and ((weapon:IsPlayer() and weapon:GetActiveWeapon():IsValid() and weapon:GetActiveWeapon():GetClass()) or weapon:GetClass()) or "unknown"
+    local WeaponName = IsValid(weapon) and
+    ((weapon:IsPlayer() and weapon:GetActiveWeapon():IsValid() and weapon:GetActiveWeapon():GetClass()) or weapon:GetClass()) or
+    "unknown"
 
     if killer == ply then
         KillerName = "Themself"
@@ -590,7 +580,7 @@ local adminCopWeapons = {
     ["weaponchecker"] = true,
 }
 function GM:PlayerCanPickupWeapon(ply, weapon)
-    if ply:isArrested() then return false end
+
     if weapon.PlayerUse == false then return false end
     local weaponClass = weapon:GetClass()
     if ply:IsAdmin() and GAMEMODE.Config.AdminsCopWeapons and adminCopWeapons[weaponClass] then return true end
@@ -620,7 +610,10 @@ function GM:PlayerSetModel(ply)
 
     if jobTable.PlayerSetModel then
         local model = jobTable.PlayerSetModel(ply)
-        if model then ply:SetModel(model) return end
+        if model then
+            ply:SetModel(model)
+            return
+        end
     end
 
     local EndModel = ""
@@ -751,7 +744,7 @@ function GM:PlayerSelectSpawn(ply)
     end
 
     local CustomSpawnPos = DarkRP.retrieveTeamSpawnPos(ply:Team())
-    if GAMEMODE.Config.customspawns and not ply:isArrested() and CustomSpawnPos and next(CustomSpawnPos) ~= nil then
+    if GAMEMODE.Config.customspawns and CustomSpawnPos and next(CustomSpawnPos) ~= nil then
         POS = CustomSpawnPos[math.random(1, #CustomSpawnPos)]
     end
 
@@ -760,15 +753,11 @@ function GM:PlayerSelectSpawn(ply)
         POS = ply.DeathPos
     end
 
-    if ply:isArrested() then
-        POS = DarkRP.retrieveJailPos() or ply.DeathPos -- If we can't find a jail pos then we'll use where they died as a last resort
-    end
-
     -- Make sure the player doesn't get stuck in something
 
     local _, hull = ply:GetHull()
 
-    POS = DarkRP.findEmptyPos(POS, {ply}, 600, 30, hull)
+    POS = DarkRP.findEmptyPos(POS, { ply }, 600, 30, hull)
 
     return spawn, POS
 end
@@ -818,13 +807,14 @@ local function enableBabyGod(ply)
     end
 
     ply:SetColor(ply.babyGodColor)
-    timer.Create(ply:EntIndex() .. "babygod", GAMEMODE.Config.babygodtime or 0, 1, fp{disableBabyGod, ply})
+    timer.Create(ply:EntIndex() .. "babygod", GAMEMODE.Config.babygodtime or 0, 1, fp { disableBabyGod, ply })
 end
 
 function GM:PlayerSpawn(ply)
     if not ply.DarkRPInitialised then
         DarkRP.errorNoHalt(
-            string.format("DarkRP was unable to introduce player \"%s\" to the game. Expect further errors and shit generally being fucked!",
+            string.format(
+                "DarkRP was unable to introduce player \"%s\" to the game. Expect further errors and shit generally being fucked!",
                 IsValid(ply) and ply:Nick() or "unknown"),
             1,
             {
@@ -891,8 +881,6 @@ end
 
 function GM:PlayerLoadout(ply)
     self.Sandbox.PlayerLoadout(self, ply)
-
-    if ply:isArrested() then return end
 
     ply.RPLicenseSpawn = true
     timer.Simple(1, function()
@@ -1002,19 +990,23 @@ function GM:PlayerDisconnected(ply)
     timer.Remove(ply:SteamID64() .. "jobtimer")
     timer.Remove(ply:SteamID64() .. "propertytax")
 
-    local isMayor = ply:isMayor()
+    local isMayor = ply.isMayor and ply:isMayor() or false
 
     local remList = collectRemoveEntities(ply)
     removeDelayed(remList, ply)
 
-    DarkRP.destroyQuestionsWithEnt(ply)
-    DarkRP.destroyVotesWithEnt(ply)
+    if DarkRP.destroyQuestionsWithEnt then
+        DarkRP.destroyQuestionsWithEnt(ply)
+    end
+    if DarkRP.destroyVotesWithEnt then
+        DarkRP.destroyVotesWithEnt(ply)
+    end
 
-    if isMayor and GetGlobalBool("DarkRP_LockDown") then -- Stop the lockdown
+    if isMayor and GetGlobalBool("DarkRP_LockDown") and DarkRP.unLockdown then -- Stop the lockdown
         DarkRP.unLockdown(ply)
     end
 
-    if isMayor and GAMEMODE.Config.shouldResetLaws then
+    if isMayor and GAMEMODE.Config.shouldResetLaws and DarkRP.resetLaws then
         DarkRP.resetLaws()
     end
 
@@ -1022,7 +1014,9 @@ function GM:PlayerDisconnected(ply)
         ply.SleepRagdoll:Remove()
     end
 
-    ply:keysUnOwnAll()
+    if ply.keysUnOwnAll then
+        ply:keysUnOwnAll()
+    end
     DarkRP.log(ply:Nick() .. " (" .. ply:SteamID() .. ") disconnected", Color(0, 130, 255))
 
     local agenda = ply:getAgendaTable()
@@ -1044,14 +1038,15 @@ end
 
 function GM:GetFallDamage(ply, flFallSpeed)
     if GetConVar("mp_falldamage"):GetBool() or GAMEMODE.Config.realisticfalldamage then
-        if GAMEMODE.Config.falldamagedamper then return flFallSpeed / GAMEMODE.Config.falldamagedamper else return flFallSpeed / 15 end
+        if GAMEMODE.Config.falldamagedamper then return flFallSpeed / GAMEMODE.Config.falldamagedamper else return
+            flFallSpeed / 15 end
     else
         if GAMEMODE.Config.falldamageamount then return GAMEMODE.Config.falldamageamount else return 10 end
     end
 end
 
 local function fuckQAC()
-    local netRecs = {"Debug1", "Debug2", "checksaum", "gcontrol_vars", "control_vars", "QUACK_QUACK_MOTHER_FUCKER"}
+    local netRecs = { "Debug1", "Debug2", "checksaum", "gcontrol_vars", "control_vars", "QUACK_QUACK_MOTHER_FUCKER" }
     for _, v in ipairs(netRecs) do
         net.Receivers[v] = fn.Id
     end
@@ -1081,11 +1076,12 @@ function GM:InitPostEntity()
 
     if GAMEMODE.Config.unlockdoorsonstart then
         for _, v in ipairs(ents.GetAll()) do
-            if not v:isDoor() then continue end
+            if not v.isDoor or not v:isDoor() then continue end
             v:Fire("unlock", "", 0)
         end
     end
 end
+
 timer.Simple(0.1, function()
     if not GAMEMODE.InitPostEntityCalled then
         GAMEMODE:InitPostEntity()
@@ -1107,7 +1103,8 @@ function GM:loadCustomDarkRPItems()
 
         -- Gotta be totally clear here
         local stack = "\tjobs.lua, settings.lua, disabled_defaults.lua or any of your other custom files."
-        DarkRP.error("GAMEMODE.DefaultTeam is not set to an existing job.", 1, hints, "lua/darkrp_customthings/jobs.lua", -1, stack)
+        DarkRP.error("GAMEMODE.DefaultTeam is not set to an existing job.", 1, hints, "lua/darkrp_customthings/jobs.lua",
+            -1, stack)
     end
 end
 

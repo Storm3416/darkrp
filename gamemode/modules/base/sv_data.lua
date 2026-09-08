@@ -520,6 +520,7 @@ function DarkRP.storeDoorData(ent)
 end
 
 function setUpNonOwnableDoors()
+    if not DarkRP.doorIndexToEnt then return end
     MySQLite.query("SELECT idx, title, isLocked, isDisabled FROM darkrp_door WHERE map = " .. MySQLite.SQLStr(string.lower(game.GetMap())) .. ";", function(r)
         if not r then return end
 
@@ -527,28 +528,30 @@ function setUpNonOwnableDoors()
             local e = DarkRP.doorIndexToEnt(tonumber(row.idx))
 
             if not IsValid(e) then continue end
-            if e:isKeysOwnable() then
-                if tobool(row.isDisabled) then
+            if e.isKeysOwnable and e:isKeysOwnable() then
+                if tobool(row.isDisabled) and e.setKeysNonOwnable then
                     e:setKeysNonOwnable(tobool(row.isDisabled))
                 end
                 if row.isLocked and row.isLocked ~= "NULL" then
                     e:Fire((tobool(row.isLocked) and "" or "un") .. "lock", "", 0)
                 end
-                e:setKeysTitle(row.title ~= "NULL" and row.title or nil)
+                if e.setKeysTitle then
+                    e:setKeysTitle(row.title ~= "NULL" and row.title or nil)
+                end
             end
         end
     end)
 end
 
 local keyValueActions = {
-    ["DarkRPNonOwnable"] = function(ent, val) ent:setKeysNonOwnable(tobool(val)) end,
-    ["DarkRPTitle"]      = function(ent, val) ent:setKeysTitle(val) end,
-    ["DarkRPDoorGroup"]  = function(ent, val) if RPExtraTeamDoors[val] then ent:setDoorGroup(val) end end,
+    ["DarkRPNonOwnable"] = function(ent, val) if ent.setKeysNonOwnable then ent:setKeysNonOwnable(tobool(val)) end end,
+    ["DarkRPTitle"]      = function(ent, val) if ent.setKeysTitle then ent:setKeysTitle(val) end end,
+    ["DarkRPDoorGroup"]  = function(ent, val) if ent.setDoorGroup and RPExtraTeamDoors[val] then ent:setDoorGroup(val) end end,
     ["DarkRPCanLockpick"] = function(ent, val) ent.DarkRPCanLockpick = tobool(val) end
 }
 
 local function onKeyValue(ent, key, value)
-    if not ent:isDoor() then return end
+    if not ent.isDoor or not ent:isDoor() then return end
 
     if keyValueActions[key] then
         keyValueActions[key](ent, value)
@@ -557,16 +560,17 @@ end
 hook.Add("EntityKeyValue", "darkrp_doors", onKeyValue)
 
 function DarkRP.storeTeamDoorOwnability(ent)
-    if not ent:CreatedByMap() then return end
+    if not ent:CreatedByMap() or not ent.doorIndex then return end
     local map = string.lower(game.GetMap())
 
     MySQLite.query("DELETE FROM darkrp_doorjobs WHERE idx = " .. ent:doorIndex() .. " AND map = " .. MySQLite.SQLStr(map) .. ";")
-    for k in pairs(ent:getKeysDoorTeams() or {}) do
+    for k in pairs(ent.getKeysDoorTeams and ent:getKeysDoorTeams() or {}) do
         MySQLite.query("INSERT INTO darkrp_doorjobs VALUES(" .. ent:doorIndex() .. ", " .. MySQLite.SQLStr(map) .. ", " .. MySQLite.SQLStr(RPExtraTeams[k].command) .. ");")
     end
 end
 
 function setUpTeamOwnableDoors()
+    if not DarkRP.doorIndexToEnt then return end
     MySQLite.query("SELECT idx, job FROM darkrp_doorjobs WHERE map = " .. MySQLite.SQLStr(string.lower(game.GetMap())) .. ";", function(r)
         if not r then return end
         local map = string.lower(game.GetMap())
@@ -579,7 +583,7 @@ function setUpTeamOwnableDoors()
 
             local _, job = DarkRP.getJobByCommand(row.job)
 
-            if job then
+            if job and e.addKeysDoorTeam then
                 e:addKeysDoorTeam(job)
             else
                 print(("can't find job %s for door %d, removing from database"):format(row.job, row.idx))
@@ -590,7 +594,7 @@ function setUpTeamOwnableDoors()
 end
 
 function DarkRP.storeDoorGroup(ent, group)
-    if not ent:CreatedByMap() then return end
+    if not ent:CreatedByMap() or not ent.doorIndex then return end
     local map = MySQLite.SQLStr(string.lower(game.GetMap()))
     local index = ent:doorIndex()
 
@@ -603,6 +607,7 @@ function DarkRP.storeDoorGroup(ent, group)
 end
 
 function setUpGroupDoors()
+    if not DarkRP.doorIndexToEnt then return end
     local map = MySQLite.SQLStr(string.lower(game.GetMap()))
     MySQLite.query("SELECT idx, doorgroup FROM darkrp_doorgroups WHERE map = " .. map, function(data)
         if not data then return end
@@ -610,11 +615,11 @@ function setUpGroupDoors()
         for _, row in pairs(data) do
             local ent = DarkRP.doorIndexToEnt(tonumber(row.idx))
 
-            if not IsValid(ent) or not ent:isKeysOwnable() then
+            if not IsValid(ent) or not ent.isKeysOwnable or not ent:isKeysOwnable() then
                 continue
             end
 
-            if not RPExtraTeamDoorIDs[row.doorgroup] then continue end
+            if not RPExtraTeamDoorIDs[row.doorgroup] or not ent.setDoorGroup then continue end
             ent:setDoorGroup(row.doorgroup)
         end
     end)

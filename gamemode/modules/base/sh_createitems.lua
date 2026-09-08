@@ -19,7 +19,6 @@ local function declareTeamCommands(CTeam)
         if isnumber(CTeam.NeedToChangeFrom) and plyTeam ~= CTeam.NeedToChangeFrom then return false end
         if istable(CTeam.NeedToChangeFrom) and not table.HasValue(CTeam.NeedToChangeFrom, plyTeam) then return false end
         if CTeam.customCheck and CTeam.customCheck(ply) == false then return false end
-        if ply:isArrested() then return false end
         local numPlayers = team.NumPlayers(k)
         if CTeam.max ~= 0 and ((CTeam.max % 1 == 0 and numPlayers >= CTeam.max) or (CTeam.max % 1 ~= 0 and (numPlayers + 1) / player.GetCount() > CTeam.max)) then return false end
         if ply.LastJob and 10 - (CurTime() - ply.LastJob) >= 0 then return false end
@@ -281,7 +280,6 @@ local function addEntityCommands(tblEnt)
         condition =
             function(ply)
                 if not tblEnt.allowPurchaseWhileDead and not ply:Alive() then return false end
-                if ply:isArrested() then return false end
                 if istable(tblEnt.allowed) and not table.HasValue(tblEnt.allowed, ply:Team()) then return false end
                 if not ply:canAfford(tblEnt.price) then return false end
                 if tblEnt.customCheck and tblEnt.customCheck(ply) == false then return false end
@@ -317,7 +315,6 @@ local function addEntityCommands(tblEnt)
     end
 
     local function buythis(ply, args)
-        if ply:isArrested() then return "" end
         if not tblEnt.allowPurchaseWhileDead and not ply:Alive() then
             DarkRP.notify(ply, 1, 4, DarkRP.getPhrase("must_be_alive_to_do_x", DarkRP.getPhrase("buy_x", tblEnt.name)))
             return ""
@@ -898,9 +895,6 @@ local function mergeCategories(customs, catKind, path)
             }, path, -1, path)
             cat = catByName.Other
         end
-
-        cat.members = cat.members or {}
-        table.insert(cat.members, v)
     end
 
     -- Sort category members

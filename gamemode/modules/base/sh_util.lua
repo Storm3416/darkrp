@@ -4,6 +4,23 @@ Utility functions
 
 local vector = FindMetaTable("Vector")
 local meta = FindMetaTable("Player")
+local entMeta = FindMetaTable("Entity")
+
+local doorClasses = {
+    ["func_door"] = true,
+    ["func_door_rotating"] = true,
+    ["prop_door_rotating"] = true,
+    ["func_movelinear"] = true,
+    ["prop_dynamic"] = true
+}
+
+function entMeta:isDoor()
+    return IsValid(self) and (doorClasses[self:GetClass()] or false) or false
+end
+
+function entMeta:isKeysOwnable()
+    return false
+end
 
 --[[---------------------------------------------------------------------------
 Decides whether the vector could be seen by the player if they were to look at it
